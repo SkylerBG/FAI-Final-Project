@@ -36,26 +36,134 @@ std::string RobotStacking::State::GetBoxInState(int list, int boxIndex)
 
 RobotStacking::State RobotStacking::State::PickUp(int list)
 {
-
-	action = "Pick-Up";
+	State newState = *this;
+	if (list == 0 && mL1.size() == 1)
+	{
+		if (mR1.mPosition == 0 && mR1.mBox == "nothing")
+		{
+			newState.mR1.mBox = mL1.at(0);
+			newState.mL1.pop_back();
+		}
+		else if (mR2.mPosition == 0 && mR2.mBox == "nothing")
+		{
+			newState.mR2.mBox = mL1.at(0);
+			newState.mL1.pop_back();
+		}
+	}
+	else if (list == 1 && mL2.size() == 1)
+	{
+		if (mR1.mPosition == 1 && mR1.mBox == "nothing")
+		{
+			newState.mR1.mBox = mL2.at(0);
+			newState.mL2.pop_back();
+		}
+		else if (mR2.mPosition == 1 && mR2.mBox == "nothing")
+		{
+			newState.mR2.mBox = mL2.at(0);
+			newState.mL2.pop_back();
+		}
+	}
+	newState.action = "Pick-Up";
+	return newState;
 }
 
 RobotStacking::State RobotStacking::State::PutDown(int list)
 {
-
-	action = "Put-Down";
+	State newState = *this;
+	if (list == 0 && mL1.size() == 0)
+	{
+		if (mR1.mPosition == 0 && mR1.mBox != "nothing")
+		{
+			mL1.push_back(newState.mR1.mBox);
+			newState.mR1.mBox = "nothing";
+		}
+		else if (mR2.mPosition == 0 && mR2.mBox != "nothing")
+		{
+			mL1.push_back(newState.mR1.mBox);
+			newState.mR2.mBox = "nothing";
+		}
+	}
+	else if (list == 1 && mL2.size() == 0)
+	{
+		if (mR1.mPosition == 1 && mR1.mBox != "nothing")
+		{
+			mL2.push_back(newState.mR2.mBox);
+			newState.mR2.mBox = "nothing";
+		}
+		else if (mR2.mPosition == 1 && mR2.mBox != "nothing")
+		{
+			mL2.push_back(newState.mR2.mBox);
+			newState.mR2.mBox = "nothing";
+		}
+	}
+	newState.action = "Put-Down";
+	return newState;
 }
 
 RobotStacking::State RobotStacking::State::Stack(int list)
 {
-
-	action = "Stack";
+	State newState = *this;
+	if (list == 0 && mL1.size() > 1)
+	{
+		if (mR1.mPosition == 0 && mR1.mBox == "nothing")
+		{
+			newState.mR1.mBox = mL1.at(0);
+			newState.mL1.pop_back();
+		}
+		else if (mR2.mPosition == 0 && mR2.mBox == "nothing")
+		{
+			newState.mR2.mBox = mL1.at(0);
+			newState.mL1.pop_back();
+		}
+	}
+	else if (list == 1 && mL2.size() > 1)
+	{
+		if (mR1.mPosition == 1 && mR1.mBox == "nothing")
+		{
+			newState.mR1.mBox = mL2.at(0);
+			newState.mL2.pop_back();
+		}
+		else if (mR2.mPosition == 1 && mR2.mBox == "nothing")
+		{
+			newState.mR2.mBox = mL2.at(0);
+			newState.mL2.pop_back();
+		}
+	}
+	newState.action = "Stack";
+	return newState;
 }
 
 RobotStacking::State RobotStacking::State::Unstack(int list)
 {
-
-	action = "Unstack";
+	State newState = *this;
+	if (list == 0 && mL1.size() > 0)
+	{
+		if (mR1.mPosition == 0 && mR1.mBox != "nothing")
+		{
+			mL1.push_back(newState.mR1.mBox);
+			newState.mR1.mBox = "nothing";
+		}
+		else if (mR2.mPosition == 0 && mR2.mBox != "nothing")
+		{
+			mL1.push_back(newState.mR1.mBox);
+			newState.mR2.mBox = "nothing";
+		}
+	}
+	else if (list == 1 && mL2.size() > 0)
+	{
+		if (mR1.mPosition == 1 && mR1.mBox != "nothing")
+		{
+			mL2.push_back(newState.mR2.mBox);
+			newState.mR2.mBox = "nothing";
+		}
+		else if (mR2.mPosition == 1 && mR2.mBox != "nothing")
+		{
+			mL2.push_back(newState.mR2.mBox);
+			newState.mR2.mBox = "nothing";
+		}
+	}
+	newState.action = "Unstack";
+	return newState;
 }
 
 RobotStacking::State RobotStacking::State::Move(int currentPosition, int newPosition)
@@ -63,13 +171,13 @@ RobotStacking::State RobotStacking::State::Move(int currentPosition, int newPosi
 	State newState = *this;
 	if (mR1.mPosition == currentPosition)
 	{
-		mR1.mPosition = newPosition;
-		mR2.mPosition = currentPosition;
+		newState.mR1.mPosition = newPosition;
+		newState.mR2.mPosition = currentPosition;
 	}
 	else if (mR2.mPosition == currentPosition)
 	{
-		mR2.mPosition = newPosition;
-		mR1.mPosition = currentPosition;
+		newState.mR2.mPosition = newPosition;
+		newState.mR1.mPosition = currentPosition;
 	}
 	newState.action = "Move";
 	return newState;

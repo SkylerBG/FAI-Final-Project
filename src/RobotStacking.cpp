@@ -103,7 +103,7 @@ std::vector<RobotStacking::State> SolveForBox(RobotStacking::State currentState,
 	std::pair<int, int> boxInGoalState = FindWhereBoxIsInState(goalState, boxToMove);
 	std::cout << "Box To Move: " << boxToMove << " is at {" << boxInGoalState.first << ", " << boxInGoalState.second << "} in the goal state" << std::endl;
 	system("pause");
-	//while()
+	while()
 
 	return statesToSolve;
 }
