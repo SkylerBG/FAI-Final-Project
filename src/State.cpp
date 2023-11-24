@@ -105,28 +105,28 @@ RobotStacking::State RobotStacking::State::Stack(int list)
 	State newState = *this;
 	if (list == 0 && mL1.size() > 1)
 	{
-		if (mR1.mPosition == 0 && mR1.mBox == "nothing")
+		if (mR1.mPosition == 0 && mR1.mBox != "nothing")
 		{
-			newState.mR1.mBox = mL1.at(0);
-			newState.mL1.pop_back();
+			newState.mL1.push_back(newState.mR1.mBox);
+			newState.mR1.mBox = "nothing";
 		}
-		else if (mR2.mPosition == 0 && mR2.mBox == "nothing")
+		else if (mR2.mPosition == 0 && mR2.mBox != "nothing")
 		{
-			newState.mR2.mBox = mL1.at(0);
-			newState.mL1.pop_back();
+			newState.mL1.push_back(newState.mR2.mBox);
+			newState.mR2.mBox = "nothing";
 		}
 	}
 	else if (list == 1 && mL2.size() > 1)
 	{
-		if (mR1.mPosition == 1 && mR1.mBox == "nothing")
+		if (mR1.mPosition == 1 && mR1.mBox != "nothing")
 		{
-			newState.mR1.mBox = mL2.at(0);
-			newState.mL2.pop_back();
+			newState.mL2.push_back(newState.mR1.mBox);
+			newState.mR1.mBox = "nothing";
 		}
-		else if (mR2.mPosition == 1 && mR2.mBox == "nothing")
+		else if (mR2.mPosition == 1 && mR2.mBox != "nothing")
 		{
-			newState.mR2.mBox = mL2.at(0);
-			newState.mL2.pop_back();
+			newState.mL2.push_back(newState.mR2.mBox);
+			newState.mR2.mBox = "nothing";
 		}
 	}
 	newState.action = "Stack";
@@ -138,28 +138,28 @@ RobotStacking::State RobotStacking::State::Unstack(int list)
 	State newState = *this;
 	if (list == 0 && mL1.size() > 0)
 	{
-		if (mR1.mPosition == 0 && mR1.mBox != "nothing")
+		if (mR1.mPosition == 0 && mR1.mBox == "nothing")
 		{
-			mL1.push_back(newState.mR1.mBox);
-			newState.mR1.mBox = "nothing";
+			newState.mR1.mBox = mL1.at(mL1.size() - 1);
+			newState.mL1.pop_back();
 		}
-		else if (mR2.mPosition == 0 && mR2.mBox != "nothing")
+		else if (mR2.mPosition == 0 && mR2.mBox == "nothing")
 		{
-			mL1.push_back(newState.mR1.mBox);
-			newState.mR2.mBox = "nothing";
+			newState.mR2.mBox = mL1.at(mL1.size() - 1);
+			newState.mL1.pop_back();
 		}
 	}
 	else if (list == 1 && mL2.size() > 0)
 	{
-		if (mR1.mPosition == 1 && mR1.mBox != "nothing")
+		if (mR1.mPosition == 1 && mR1.mBox == "nothing")
 		{
-			mL2.push_back(newState.mR2.mBox);
-			newState.mR2.mBox = "nothing";
+			newState.mR1.mBox = mL2.at(mL2.size() - 1);
+			newState.mL2.pop_back();
 		}
-		else if (mR2.mPosition == 1 && mR2.mBox != "nothing")
+		else if (mR2.mPosition == 1 && mR2.mBox == "nothing")
 		{
-			mL2.push_back(newState.mR2.mBox);
-			newState.mR2.mBox = "nothing";
+			newState.mR2.mBox = mL2.at(mL2.size() - 1);
+			newState.mL2.pop_back();
 		}
 	}
 	newState.action = "Unstack";
@@ -211,4 +211,27 @@ bool RobotStacking::State::operator==(State otherState)
 bool RobotStacking::State::operator!=(State otherState)
 {
 	return !(*this == otherState);
+}
+
+std::string RobotStacking::State::toString()
+{
+	std::string returnString;
+	returnString += "mL1: {";
+	for (std::string x : mL1)
+	{
+		returnString += x + ", ";
+	}
+	returnString += "}\n";
+
+	returnString += "mL2: {";
+	for (std::string x : mL2)
+	{
+		returnString += x + ", ";
+	}
+	returnString += "}\n";
+
+	returnString += "mR1 (" + std::to_string(mR1.mPosition) + "): " + mR1.mBox + "\n";
+	returnString += "mR2 (" + std::to_string(mR2.mPosition) + "): " + mR2.mBox + "\n";
+	returnString += "action: " + action + "\n";
+	return returnString;
 }

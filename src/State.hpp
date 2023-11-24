@@ -29,6 +29,8 @@ namespace RobotStacking
 		bool operator==(State otherState);
 		bool operator!=(State otherState);
 
+		std::string toString();
+
 		RobotArm mR1 = RobotArm(0), mR2 = RobotArm(1);
 		std::string action;
 		std::vector<std::string> mL1, mL2;

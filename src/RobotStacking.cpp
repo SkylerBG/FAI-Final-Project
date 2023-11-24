@@ -103,7 +103,139 @@ std::vector<RobotStacking::State> SolveForBox(RobotStacking::State currentState,
 	std::pair<int, int> boxInGoalState = FindWhereBoxIsInState(goalState, boxToMove);
 	std::cout << "Box To Move: " << boxToMove << " is at {" << boxInGoalState.first << ", " << boxInGoalState.second << "} in the goal state" << std::endl;
 	system("pause");
-	while()
+	
+	while (currentState.mR1.mBox != boxToMove && currentState.mR2.mBox != boxToMove)
+	{
+		if (whichList == 0)
+		{
+			if (currentState.mR1.mPosition == 0)
+			{
+				if (currentState.mR1.mBox != "nothing")
+				{
+					if (currentState.mR2.mBox != "nothing")
+					{
+						if (currentState.mL2.size() > 1)
+						{
+							currentState = currentState.Stack(1);
+						}
+						else
+						{
+							currentState = currentState.PutDown(1);
+						}
+						statesToSolve.push_back(currentState);
+					}
+					currentState = currentState.Move(0, 1);
+				}
+				else
+				{
+					if (currentState.mL1.size() > 1)
+					{
+						currentState = currentState.Unstack(0);
+					}
+					else
+					{
+						currentState = currentState.PickUp(0);
+					}
+				}
+			}
+			else if (currentState.mR2.mPosition == 0)
+			{
+				if (currentState.mR2.mBox != "nothing")
+				{
+					if (currentState.mR1.mBox != "nothing")
+					{
+						if (currentState.mL2.size() > 1)
+						{
+							currentState = currentState.Stack(1);
+						}
+						else
+						{
+							currentState = currentState.PutDown(1);
+						}
+						statesToSolve.push_back(currentState);
+					}
+					currentState = currentState.Move(0, 1);
+				}
+				else
+				{
+					if (currentState.mL2.size() > 1)
+					{
+						currentState = currentState.Unstack(0);
+					}
+					else
+					{
+						currentState = currentState.PickUp(0);
+					}
+				}
+			}
+		}
+		else if (whichList == 1)
+		{
+			if (currentState.mR1.mPosition == 1)
+			{
+				if (currentState.mR1.mBox != "nothing")
+				{
+					if (currentState.mR2.mBox != "nothing")
+					{
+						if (currentState.mL1.size() > 1)
+						{
+							currentState = currentState.Stack(0);
+						}
+						else
+						{
+							currentState = currentState.PutDown(0);
+						}
+						statesToSolve.push_back(currentState);
+					}
+					currentState = currentState.Move(1, 0);
+				}
+				else
+				{
+					if (currentState.mL2.size() > 1)
+					{
+						currentState = currentState.Unstack(1);
+					}
+					else
+					{
+						currentState = currentState.PickUp(1);
+					}
+				}
+			}
+			else if (currentState.mR2.mPosition == 1)
+			{
+				if (currentState.mR2.mBox != "nothing")
+				{
+					if (currentState.mR1.mBox != "nothing")
+					{
+						if (currentState.mL1.size() > 1)
+						{
+							currentState = currentState.Stack(0);
+						}
+						else
+						{
+							currentState = currentState.PutDown(0);
+						}
+						statesToSolve.push_back(currentState);
+					}
+					currentState = currentState.Move(1, 0);
+				}
+				else
+				{
+					if (currentState.mL2.size() > 1)
+					{
+						currentState = currentState.Unstack(1);
+					}
+					else
+					{
+						currentState = currentState.PickUp(1);
+					}
+				}
+			}
+		}
+		statesToSolve.push_back(currentState);
+	}
+
+
 
 	return statesToSolve;
 }
