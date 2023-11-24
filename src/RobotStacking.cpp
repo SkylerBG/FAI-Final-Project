@@ -4,11 +4,14 @@
 #include <string>
 #include <vector>
 
+#include <chrono>
+
 int InPlaceInLists(std::vector<std::string> currentStateList, std::vector<std::string> goalStateList);
 std::vector<RobotStacking::State> SolveForBox(RobotStacking::State currentState, RobotStacking::State goalState, int whichBox, int whichList);
 
 int main()
 {
+	auto start = std::chrono::system_clock::now();
 	RobotStacking::DataContainer mData = RobotStacking::DataContainer();
 	std::vector<std::string> initialL1 = {"b", "e", "c"};
 	std::vector<std::string> initialL2 = {"a", "g", "f", "d"};
@@ -35,18 +38,22 @@ int main()
 		//Only save the shortest moves
 		std::vector<RobotStacking::State> nextL1BoxSolved = SolveForBox(currentState, goalState, inPlaceL1, 0);
 		std::vector<RobotStacking::State> nextL2BoxSolved = SolveForBox(currentState, goalState, inPlaceL2, 1);
-		if (nextL1BoxSolved.size() > 0 && nextL1BoxSolved.size() < nextL2BoxSolved.size())
+		if (nextL1BoxSolved.size() > 0 && (nextL2BoxSolved.size() == 0 || nextL1BoxSolved.size() < nextL2BoxSolved.size()))
 		{
 			mData.AddStates(nextL1BoxSolved);
 		}
-		else if (nextL2BoxSolved.size() > 0 && nextL2BoxSolved.size() < nextL1BoxSolved.size())
+		else if (nextL2BoxSolved.size() > 0 && (nextL1BoxSolved.size() == 0 || nextL2BoxSolved.size() < nextL1BoxSolved.size()))
 		{
 			mData.AddStates(nextL2BoxSolved);
 		}
 
 		currentState = mData.GetState(mData.GetStates().size() - 1);
 	}
-
+	auto end = std::chrono::system_clock::now();
+	std::chrono::duration<double> computationTime = end - start;
+	std::cout << "\nCURRENT STATE: \n" << currentState.toString() << std::endl << "Computation took: " << computationTime.count() << " s\nFor: "
+		<< mData.GetStates().size() << " states" << std::endl;
+	
 	system("pause");
 	return 0;
 }
@@ -99,14 +106,17 @@ std::vector<RobotStacking::State> SolveForBox(RobotStacking::State currentState,
 {
 	std::vector<RobotStacking::State> statesToSolve;
 
-	std::string boxToMove = currentState.GetBoxInState(whichList, whichBox);
-	std::pair<int, int> boxInGoalState = FindWhereBoxIsInState(goalState, boxToMove);
-	std::cout << "Box To Move: " << boxToMove << " is at {" << boxInGoalState.first << ", " << boxInGoalState.second << "} in the goal state" << std::endl;
-	system("pause");
-	
+	std::string boxToMove = goalState.GetBoxInState(whichList, whichBox);
+	if (boxToMove == "nothing")
+	{
+		return statesToSolve;
+	}
+
+	//pick up
+	std::pair<int, int> boxInCurrentState = FindWhereBoxIsInState(currentState, boxToMove);
 	while (currentState.mR1.mBox != boxToMove && currentState.mR2.mBox != boxToMove)
 	{
-		if (whichList == 0)
+		if (boxInCurrentState.first == 0)
 		{
 			if (currentState.mR1.mPosition == 0)
 			{
@@ -114,7 +124,7 @@ std::vector<RobotStacking::State> SolveForBox(RobotStacking::State currentState,
 				{
 					if (currentState.mR2.mBox != "nothing")
 					{
-						if (currentState.mL2.size() > 1)
+						if (currentState.mL2.size() > 0)
 						{
 							currentState = currentState.Stack(1);
 						}
@@ -144,7 +154,7 @@ std::vector<RobotStacking::State> SolveForBox(RobotStacking::State currentState,
 				{
 					if (currentState.mR1.mBox != "nothing")
 					{
-						if (currentState.mL2.size() > 1)
+						if (currentState.mL2.size() > 0)
 						{
 							currentState = currentState.Stack(1);
 						}
@@ -158,7 +168,7 @@ std::vector<RobotStacking::State> SolveForBox(RobotStacking::State currentState,
 				}
 				else
 				{
-					if (currentState.mL2.size() > 1)
+					if (currentState.mL1.size() > 1)
 					{
 						currentState = currentState.Unstack(0);
 					}
@@ -169,7 +179,7 @@ std::vector<RobotStacking::State> SolveForBox(RobotStacking::State currentState,
 				}
 			}
 		}
-		else if (whichList == 1)
+		else if (boxInCurrentState.first == 1)
 		{
 			if (currentState.mR1.mPosition == 1)
 			{
@@ -177,7 +187,7 @@ std::vector<RobotStacking::State> SolveForBox(RobotStacking::State currentState,
 				{
 					if (currentState.mR2.mBox != "nothing")
 					{
-						if (currentState.mL1.size() > 1)
+						if (currentState.mL1.size() > 0)
 						{
 							currentState = currentState.Stack(0);
 						}
@@ -207,7 +217,7 @@ std::vector<RobotStacking::State> SolveForBox(RobotStacking::State currentState,
 				{
 					if (currentState.mR1.mBox != "nothing")
 					{
-						if (currentState.mL1.size() > 1)
+						if (currentState.mL1.size() > 0)
 						{
 							currentState = currentState.Stack(0);
 						}
@@ -234,12 +244,12 @@ std::vector<RobotStacking::State> SolveForBox(RobotStacking::State currentState,
 		}
 		statesToSolve.push_back(currentState);
 	}
-	std::cout << currentState.toString() << std::endl;
-	system("pause");
-	while ((boxInGoalState.second == 0 && currentState.mL1.size() > boxInGoalState.first) || 
-		(boxInGoalState.second == 1 && currentState.mL2.size() > boxInGoalState.first))
+
+	//put down
+	while ((whichList == 0 && currentState.mL1.size() > whichBox) ||
+		(whichList == 1 && currentState.mL2.size() > whichBox))
 	{
-		if (boxInGoalState.second == 0)
+		if (whichList == 0)
 		{
 			if (currentState.mR1.mBox != boxToMove)
 			{
@@ -320,7 +330,7 @@ std::vector<RobotStacking::State> SolveForBox(RobotStacking::State currentState,
 				}
 			}
 		}
-		else if (boxInGoalState.second == 1)
+		else if (whichList == 1)
 		{
 			if (currentState.mR1.mBox != boxToMove)
 			{
@@ -401,11 +411,53 @@ std::vector<RobotStacking::State> SolveForBox(RobotStacking::State currentState,
 				}
 			}
 		}
+		statesToSolve.push_back(currentState);
 	}
-	std::cout << currentState.toString() << std::endl;
-	system("pause");
 
+	//put down last one 
+	std::vector<std::string> goalList;
+	if (whichList == 0)
+	{
+		goalList = currentState.mL1;
+	}
+	else
+	{
+		goalList = currentState.mL2;
+	}
 
+	if (currentState.mR1.mBox == boxToMove)
+	{
+		if (currentState.mR1.mPosition != whichList)
+		{
+			currentState = currentState.Move(0, 1);
+			statesToSolve.push_back(currentState);
+		}
+		if (goalList.size() > 0)
+		{
+			currentState = currentState.Stack(whichList);
+		}
+		else
+		{
+			currentState = currentState.PutDown(whichList);
+		}
+	}
+	else if (currentState.mR2.mBox == boxToMove)
+	{
+		if (currentState.mR2.mPosition != whichList)
+		{
+			currentState = currentState.Move(0, 1);
+			statesToSolve.push_back(currentState);
+		}
+		if (goalList.size() > 0)
+		{
+			currentState = currentState.Stack(whichList);
+		}
+		else
+		{
+			currentState = currentState.PutDown(whichList);
+		}
+	}
+	statesToSolve.push_back(currentState);
 
 	return statesToSolve;
 }
