@@ -88,7 +88,7 @@ RobotStacking::State RobotStacking::State::PutDown(int list)
 		if (mR1.mPosition == 1 && mR1.mBox != "nothing")
 		{
 			newState.mL2.push_back(newState.mR1.mBox);
-			newState.mR2.mBox = "nothing";
+			newState.mR1.mBox = "nothing";
 		}
 		else if (mR2.mPosition == 1 && mR2.mBox != "nothing")
 		{

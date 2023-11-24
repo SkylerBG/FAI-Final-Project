@@ -13,13 +13,18 @@ int main()
 {
 	auto start = std::chrono::system_clock::now();
 	RobotStacking::DataContainer mData = RobotStacking::DataContainer();
-	std::vector<std::string> initialL1 = {"b", "e", "c"};
-	std::vector<std::string> initialL2 = {"a", "g", "f", "d"};
+	//a, b, c, d, e, f, g, h, i, j, k, m, n
+	/*std::vector<std::string> initialL1 = {"b", "e", "c"};
+	std::vector<std::string> initialL2 = {"a", "g", "f", "d"};*/
+	std::vector<std::string> initialL1 = { "b", "e", "c", "m", "j", "i", "k"};
+	std::vector<std::string> initialL2 = { "a", "g", "f", "d", "h", "n"};
 	RobotStacking::RobotArm initialR1 = RobotStacking::RobotArm(0, "nothing"), initialR2 = RobotStacking::RobotArm(1, "nothing");
 	RobotStacking::State currentState = RobotStacking::State(initialL1, initialL2, initialR1, initialR2);
 
-	std::vector<std::string> goalL1 = {"a", "b", "c", "d"};
-	std::vector<std::string> goalL2 = {"e", "f", "g"};
+	/*std::vector<std::string> goalL1 = {"a", "b", "c", "d"};
+	std::vector<std::string> goalL2 = {"e", "f", "g"};*/
+	std::vector<std::string> goalL1 = { "a", "b", "c", "d", "e", "f", "g"};
+	std::vector<std::string> goalL2 = { "h", "i", "j", "k", "m", "n"};
 	RobotStacking::RobotArm goalR1 = RobotStacking::RobotArm(0, "nothing"), goalR2 = RobotStacking::RobotArm(1, "nothing");
 	RobotStacking::State goalState = RobotStacking::State(goalL1, goalL2, goalR1, goalR2);
 
@@ -38,7 +43,7 @@ int main()
 		//Only save the shortest moves
 		std::vector<RobotStacking::State> nextL1BoxSolved = SolveForBox(currentState, goalState, inPlaceL1, 0);
 		std::vector<RobotStacking::State> nextL2BoxSolved = SolveForBox(currentState, goalState, inPlaceL2, 1);
-		if (nextL1BoxSolved.size() > 0 && (nextL2BoxSolved.size() == 0 || nextL1BoxSolved.size() < nextL2BoxSolved.size()))
+		if (nextL1BoxSolved.size() > 0 && (nextL2BoxSolved.size() == 0 || nextL1BoxSolved.size() <= nextL2BoxSolved.size()))
 		{
 			mData.AddStates(nextL1BoxSolved);
 		}
