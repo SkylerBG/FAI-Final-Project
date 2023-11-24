@@ -234,6 +234,176 @@ std::vector<RobotStacking::State> SolveForBox(RobotStacking::State currentState,
 		}
 		statesToSolve.push_back(currentState);
 	}
+	std::cout << currentState.toString() << std::endl;
+	system("pause");
+	while ((boxInGoalState.second == 0 && currentState.mL1.size() > boxInGoalState.first) || 
+		(boxInGoalState.second == 1 && currentState.mL2.size() > boxInGoalState.first))
+	{
+		if (boxInGoalState.second == 0)
+		{
+			if (currentState.mR1.mBox != boxToMove)
+			{
+				if (currentState.mR1.mPosition == 0)
+				{
+					if (currentState.mR1.mBox == "nothing")
+					{
+						if (currentState.mL1.size() > 1)
+						{
+							currentState = currentState.Unstack(0);
+						}
+						else
+						{
+							currentState = currentState.PickUp(0);
+						}
+					}
+					else
+					{
+						currentState = currentState.Move(0, 1);
+					}
+				}
+				else if (currentState.mR1.mPosition == 1)
+				{
+					if (currentState.mR1.mBox == "nothing")
+					{
+						currentState = currentState.Move(1, 0);
+					}
+					else
+					{
+						if (currentState.mL2.size() > 0)
+						{
+							currentState = currentState.Stack(1);
+						}
+						else
+						{
+							currentState = currentState.PutDown(1);
+						}
+					}
+				}
+			}
+			else if (currentState.mR2.mBox != boxToMove)
+			{
+				if (currentState.mR2.mPosition == 0)
+				{
+					if (currentState.mR2.mBox == "nothing")
+					{
+						if (currentState.mL1.size() > 1)
+						{
+							currentState = currentState.Unstack(0);
+						}
+						else
+						{
+							currentState = currentState.PickUp(0);
+						}
+					}
+					else
+					{
+						currentState = currentState.Move(0, 1);
+					}
+				}
+				else if (currentState.mR2.mPosition == 1)
+				{
+					if (currentState.mR2.mBox == "nothing")
+					{
+						currentState = currentState.Move(1, 0);
+					}
+					else
+					{
+						if (currentState.mL2.size() > 0)
+						{
+							currentState = currentState.Stack(1);
+						}
+						else
+						{
+							currentState = currentState.PutDown(1);
+						}
+					}
+				}
+			}
+		}
+		else if (boxInGoalState.second == 1)
+		{
+			if (currentState.mR1.mBox != boxToMove)
+			{
+				if (currentState.mR1.mPosition == 1)
+				{
+					if (currentState.mR1.mBox == "nothing")
+					{
+						if (currentState.mL2.size() > 1)
+						{
+							currentState = currentState.Unstack(1);
+						}
+						else
+						{
+							currentState = currentState.PickUp(1);
+						}
+					}
+					else
+					{
+						currentState = currentState.Move(1, 0);
+					}
+				}
+				else if (currentState.mR1.mPosition == 0)
+				{
+					if (currentState.mR1.mBox == "nothing")
+					{
+						currentState = currentState.Move(0, 1);
+					}
+					else
+					{
+						if (currentState.mL1.size() > 0)
+						{
+							currentState = currentState.Stack(0);
+						}
+						else
+						{
+							currentState = currentState.PutDown(0);
+						}
+					}
+				}
+			}
+			else if (currentState.mR2.mBox != boxToMove)
+			{
+				if (currentState.mR2.mPosition == 1)
+				{
+					if (currentState.mR2.mBox == "nothing")
+					{
+						if (currentState.mL2.size() > 1)
+						{
+							currentState = currentState.Unstack(1);
+						}
+						else
+						{
+							currentState = currentState.PickUp(1);
+						}
+					}
+					else
+					{
+						currentState = currentState.Move(1, 0);
+					}
+				}
+				else if (currentState.mR2.mPosition == 0)
+				{
+					if (currentState.mR2.mBox == "nothing")
+					{
+						currentState = currentState.Move(0, 1);
+					}
+					else
+					{
+						if (currentState.mL1.size() > 0)
+						{
+							currentState = currentState.Stack(0);
+						}
+						else
+						{
+							currentState = currentState.PutDown(0);
+						}
+					}
+				}
+			}
+		}
+	}
+	std::cout << currentState.toString() << std::endl;
+	system("pause");
 
 
 

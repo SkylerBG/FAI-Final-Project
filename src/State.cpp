@@ -74,12 +74,12 @@ RobotStacking::State RobotStacking::State::PutDown(int list)
 	{
 		if (mR1.mPosition == 0 && mR1.mBox != "nothing")
 		{
-			mL1.push_back(newState.mR1.mBox);
+			newState.mL1.push_back(newState.mR1.mBox);
 			newState.mR1.mBox = "nothing";
 		}
 		else if (mR2.mPosition == 0 && mR2.mBox != "nothing")
 		{
-			mL1.push_back(newState.mR1.mBox);
+			newState.mL1.push_back(newState.mR2.mBox);
 			newState.mR2.mBox = "nothing";
 		}
 	}
@@ -87,12 +87,12 @@ RobotStacking::State RobotStacking::State::PutDown(int list)
 	{
 		if (mR1.mPosition == 1 && mR1.mBox != "nothing")
 		{
-			mL2.push_back(newState.mR2.mBox);
+			newState.mL2.push_back(newState.mR1.mBox);
 			newState.mR2.mBox = "nothing";
 		}
 		else if (mR2.mPosition == 1 && mR2.mBox != "nothing")
 		{
-			mL2.push_back(newState.mR2.mBox);
+			newState.mL2.push_back(newState.mR2.mBox);
 			newState.mR2.mBox = "nothing";
 		}
 	}
@@ -103,7 +103,7 @@ RobotStacking::State RobotStacking::State::PutDown(int list)
 RobotStacking::State RobotStacking::State::Stack(int list)
 {
 	State newState = *this;
-	if (list == 0 && mL1.size() > 1)
+	if (list == 0 && mL1.size() > 0)
 	{
 		if (mR1.mPosition == 0 && mR1.mBox != "nothing")
 		{
@@ -116,7 +116,7 @@ RobotStacking::State RobotStacking::State::Stack(int list)
 			newState.mR2.mBox = "nothing";
 		}
 	}
-	else if (list == 1 && mL2.size() > 1)
+	else if (list == 1 && mL2.size() > 0)
 	{
 		if (mR1.mPosition == 1 && mR1.mBox != "nothing")
 		{
@@ -136,7 +136,7 @@ RobotStacking::State RobotStacking::State::Stack(int list)
 RobotStacking::State RobotStacking::State::Unstack(int list)
 {
 	State newState = *this;
-	if (list == 0 && mL1.size() > 0)
+	if (list == 0 && mL1.size() > 1)
 	{
 		if (mR1.mPosition == 0 && mR1.mBox == "nothing")
 		{
@@ -149,7 +149,7 @@ RobotStacking::State RobotStacking::State::Unstack(int list)
 			newState.mL1.pop_back();
 		}
 	}
-	else if (list == 1 && mL2.size() > 0)
+	else if (list == 1 && mL2.size() > 1)
 	{
 		if (mR1.mPosition == 1 && mR1.mBox == "nothing")
 		{
