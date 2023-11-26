@@ -216,22 +216,76 @@ bool RobotStacking::State::operator!=(State otherState)
 std::string RobotStacking::State::toString()
 {
 	std::string returnString;
-	returnString += "mL1: {";
-	for (std::string x : mL1)
+	returnString += "Robot Arm ";
+	if (mR1.mPosition == 0)
 	{
-		returnString += x + ", ";
+		returnString += " 1     Robot Arm 2\n";
 	}
-	returnString += "}\n";
-
-	returnString += "mL2: {";
-	for (std::string x : mL2)
+	else
 	{
-		returnString += x + ", ";
+		returnString += " 2     Robot Arm 1\n";
 	}
-	returnString += "}\n";
 
-	returnString += "mR1 (" + std::to_string(mR1.mPosition) + "): " + mR1.mBox + "\n";
-	returnString += "mR2 (" + std::to_string(mR2.mPosition) + "): " + mR2.mBox + "\n";
+	returnString += "     *               *  \n";
+	returnString += "   *****           *****\n";
+	if (mR1.mPosition == 0)
+	{
+		returnString += "   * ";
+		returnString += (mR1.mBox == "nothing") ? " " : mR1.mBox;
+		returnString += " *           * ";
+		returnString += (mR2.mBox == "nothing") ? " " : mR2.mBox;
+		returnString += " *\n";
+	}
+	if (mR2.mPosition == 0)
+	{
+		returnString += "   * ";
+		returnString += (mR2.mBox == "nothing") ? " " : mR2.mBox;
+		returnString += " *           * ";
+		returnString += (mR1.mBox == "nothing") ? " " : mR1.mBox;
+		returnString += " *\n";
+	}
+
+	if (mR1.mPosition == 0)
+	{
+		returnString += "   *";
+		returnString += (mR1.mBox == "nothing") ? "   " : "***";
+		returnString += "*           *";
+		returnString += (mR2.mBox == "nothing") ? "   " : "***";
+		returnString += "*\n";
+	}
+	if (mR2.mPosition == 0)
+	{
+		returnString += "   *";
+		returnString += (mR2.mBox == "nothing") ? "   " : "***";
+		returnString += "*           *";
+		returnString += (mR1.mBox == "nothing") ? "   " : "***";
+		returnString += "*\n";
+	}
+	returnString += "\n";
+
+	int maxSize = (mL1.size() > mL2.size()) ? mL1.size() : mL2.size();
+	for (int i = maxSize - 1; i >= 0; i--)
+	{
+		returnString += "   ";
+		if (i < mL1.size() && i < mL2.size())
+		{
+			returnString += "*****           *****\n   ";
+			returnString += "* " + mL1.at(i) + " *           * " + mL2.at(i) + " * \n   ";
+			returnString += "*****           *****\n";
+		}
+		else if (i < mL1.size())
+		{
+			returnString += "*****\n   ";
+			returnString += "* " + mL1.at(i) + " *\n   ";
+			returnString += "*****\n";
+		}
+		else if (i < mL2.size())
+		{
+			returnString += "                *****\n   ";
+			returnString += "                * " + mL2.at(i) + " *\n   ";
+			returnString += "                *****\n";
+		}
+	}
 	returnString += "action: " + action + "\n";
 	return returnString;
 }

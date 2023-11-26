@@ -11,23 +11,23 @@ std::vector<RobotStacking::State> SolveForBox(RobotStacking::State currentState,
 
 int main()
 {
-	auto start = std::chrono::system_clock::now();
 	RobotStacking::DataContainer mData = RobotStacking::DataContainer();
 	//a, b, c, d, e, f, g, h, i, j, k, m, n
-	/*std::vector<std::string> initialL1 = {"b", "e", "c"};
-	std::vector<std::string> initialL2 = {"a", "g", "f", "d"};*/
-	std::vector<std::string> initialL1 = { "b", "e", "c", "m", "j", "i", "k"};
-	std::vector<std::string> initialL2 = { "a", "g", "f", "d", "h", "n"};
+	std::vector<std::string> initialL1 = {"b", "e", "c"};
+	std::vector<std::string> initialL2 = {"a", "g", "f", "d"};
+	/*std::vector<std::string> initialL1 = { "b", "e", "c", "m", "j", "i", "k"};
+	std::vector<std::string> initialL2 = { "a", "g", "f", "d", "h", "n"};*/
 	RobotStacking::RobotArm initialR1 = RobotStacking::RobotArm(0, "nothing"), initialR2 = RobotStacking::RobotArm(1, "nothing");
 	RobotStacking::State currentState = RobotStacking::State(initialL1, initialL2, initialR1, initialR2);
 
-	/*std::vector<std::string> goalL1 = {"a", "b", "c", "d"};
-	std::vector<std::string> goalL2 = {"e", "f", "g"};*/
-	std::vector<std::string> goalL1 = { "a", "b", "c", "d", "e", "f", "g"};
-	std::vector<std::string> goalL2 = { "h", "i", "j", "k", "m", "n"};
+	std::vector<std::string> goalL1 = {"a", "b", "c", "d"};
+	std::vector<std::string> goalL2 = {"e", "f", "g"};
+	/*std::vector<std::string> goalL1 = { "a", "b", "c", "d", "e", "f", "g"};
+	std::vector<std::string> goalL2 = { "h", "i", "j", "k", "m", "n"};*/
 	RobotStacking::RobotArm goalR1 = RobotStacking::RobotArm(0, "nothing"), goalR2 = RobotStacking::RobotArm(1, "nothing");
 	RobotStacking::State goalState = RobotStacking::State(goalL1, goalL2, goalR1, goalR2);
 
+	auto start = std::chrono::system_clock::now();
 	mData.AddState(currentState);
 	while (currentState != goalState)
 	{
@@ -56,6 +56,14 @@ int main()
 	}
 	auto end = std::chrono::system_clock::now();
 	std::chrono::duration<double> computationTime = end - start;
+
+	int stateCounter = 0;
+	for (RobotStacking::State state : mData.GetStates())
+	{
+		std::cout << "\nSTATE " << stateCounter << ": \n" << state.toString() << std::endl;
+		stateCounter++;
+		system("pause");
+	}
 	std::cout << "\nCURRENT STATE: \n" << currentState.toString() << std::endl << "Computation took: " << computationTime.count() << " s\nFor: "
 		<< mData.GetStates().size() << " states" << std::endl;
 	
