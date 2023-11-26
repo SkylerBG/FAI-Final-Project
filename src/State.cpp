@@ -286,6 +286,6 @@ std::string RobotStacking::State::toString()
 			returnString += "                *****\n";
 		}
 	}
-	returnString += "action: " + action + "\n";
+	returnString += "Action: " + action + "\n";
 	return returnString;
 }

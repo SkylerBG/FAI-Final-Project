@@ -6,69 +6,340 @@
 
 #include <chrono>
 
+std::vector<std::string> GetLocationListFromString(std::string listString);
 int InPlaceInLists(std::vector<std::string> currentStateList, std::vector<std::string> goalStateList);
 std::vector<RobotStacking::State> SolveForBox(RobotStacking::State currentState, RobotStacking::State goalState, int whichBox, int whichList);
 
 int main()
 {
-	RobotStacking::DataContainer mData = RobotStacking::DataContainer();
-	//a, b, c, d, e, f, g, h, i, j, k, m, n
-	std::vector<std::string> initialL1 = {"b", "e", "c"};
-	std::vector<std::string> initialL2 = {"a", "g", "f", "d"};
-	/*std::vector<std::string> initialL1 = { "b", "e", "c", "m", "j", "i", "k"};
-	std::vector<std::string> initialL2 = { "a", "g", "f", "d", "h", "n"};*/
-	RobotStacking::RobotArm initialR1 = RobotStacking::RobotArm(0, "nothing"), initialR2 = RobotStacking::RobotArm(1, "nothing");
-	RobotStacking::State currentState = RobotStacking::State(initialL1, initialL2, initialR1, initialR2);
-
-	std::vector<std::string> goalL1 = {"a", "b", "c", "d"};
-	std::vector<std::string> goalL2 = {"e", "f", "g"};
-	/*std::vector<std::string> goalL1 = { "a", "b", "c", "d", "e", "f", "g"};
-	std::vector<std::string> goalL2 = { "h", "i", "j", "k", "m", "n"};*/
-	RobotStacking::RobotArm goalR1 = RobotStacking::RobotArm(0, "nothing"), goalR2 = RobotStacking::RobotArm(1, "nothing");
-	RobotStacking::State goalState = RobotStacking::State(goalL1, goalL2, goalR1, goalR2);
-
-	auto start = std::chrono::system_clock::now();
-	mData.AddState(currentState);
-	while (currentState != goalState)
+	std::cout << "Robot Stacking\n";
+	bool goAgain = true;
+	while (goAgain)
 	{
-		int inPlaceL1 = InPlaceInLists(currentState.mL1, goalState.mL1);
-		int inPlaceL2 = InPlaceInLists(currentState.mL2, goalState.mL2);
+		std::string list;
 
-		//both lists are solved so put the robot arms in the correct spot
-		if (inPlaceL1 == currentState.mL1.size() && inPlaceL2 == currentState.mL2.size())
-		{
+		std::cout << "Enter Initial State Boxes in Location 1 from bottom to top and seperated by spaces: \n";
+		std::getline(std::cin, list);
+		std::vector<std::string> initialL1 = GetLocationListFromString(list);
 
-		}
-		
-		//Only save the shortest moves
-		std::vector<RobotStacking::State> nextL1BoxSolved = SolveForBox(currentState, goalState, inPlaceL1, 0);
-		std::vector<RobotStacking::State> nextL2BoxSolved = SolveForBox(currentState, goalState, inPlaceL2, 1);
-		if (nextL1BoxSolved.size() > 0 && (nextL2BoxSolved.size() == 0 || nextL1BoxSolved.size() <= nextL2BoxSolved.size()))
+		std::cout << "Enter Initial State Boxes in Location 2 from bottom to top and seperated by spaces: \n";
+		std::getline(std::cin, list);
+		std::vector<std::string> initialL2 = GetLocationListFromString(list);
+		//a, b, c, d, e, f, g, h, i, j, k, m, n
+		/*std::vector<std::string> initialL1 = { "b", "e", "c" };
+		std::vector<std::string> initialL2 = { "a", "g", "f", "d" };*/
+		int armPosition = 0;
+		std::string armBox;
+		std::cout << "Enter the Initial Position and Initial Box held in Robot Arm 1 seperated by a space (if nothing is held write nothing): \n";
+		std::cin >> armPosition;
+		std::getline(std::cin, armBox);
+		armPosition--;
+		armBox = armBox.substr(armBox.find_first_of(" ")+1, armBox.size());
+		RobotStacking::RobotArm initialR1 = RobotStacking::RobotArm(armPosition, armBox);
+
+		armPosition = 1;
+		std::cout << "Enter the Initial Position and Initial Box held in Robot Arm 2 seperated by a space (if nothing is held write nothing): \n";
+		std::cin >> armPosition;
+		std::getline(std::cin, armBox);
+		armPosition--;
+		armBox = armBox.substr(armBox.find_first_of(" ")+1, armBox.size());
+		RobotStacking::RobotArm initialR2 = RobotStacking::RobotArm(armPosition, armBox);
+		RobotStacking::State currentState = RobotStacking::State(initialL1, initialL2, initialR1, initialR2);
+
+		std::cout << std::endl;
+		/*std::vector<std::string> goalL1 = { "a", "b", "c", "d" };
+		std::vector<std::string> goalL2 = { "e", "f", "g" };*/
+		std::cout << "Enter Goal State Boxes in Location 1 from bottom to top and seperated by spaces: \n";
+		std::getline(std::cin, list);
+		std::vector<std::string> goalL1 = GetLocationListFromString(list);
+
+		std::cout << "Enter Goal State Boxes in Location 2 from bottom to top and seperated by spaces: \n";
+		std::getline(std::cin, list);
+		std::vector<std::string> goalL2 = GetLocationListFromString(list);
+
+		std::cout << "Enter the Goal Position and Goal Box held in Robot Arm 1 seperated by a space (if nothing is held write nothing): \n";
+		std::cin >> armPosition;
+		std::getline(std::cin, armBox);
+		armPosition--;
+		armBox = armBox.substr(armBox.find_first_of(" ") + 1, armBox.size());
+		RobotStacking::RobotArm goalR1 = RobotStacking::RobotArm(armPosition, armBox);
+
+		std::cout << "Enter the Goal Position and Goal Box held in Robot Arm 2 seperated by a space (if nothing is held write nothing): \n";
+		std::cin >> armPosition;
+		std::getline(std::cin, armBox);
+		armPosition--;
+		armBox = armBox.substr(armBox.find_first_of(" ") + 1, armBox.size());
+		RobotStacking::RobotArm goalR2 = RobotStacking::RobotArm(armPosition, armBox);
+		RobotStacking::State goalState = RobotStacking::State(goalL1, goalL2, goalR1, goalR2);
+
+		auto start = std::chrono::system_clock::now();
+		RobotStacking::DataContainer mData = RobotStacking::DataContainer();
+		mData.AddState(currentState);
+		while (currentState != goalState)
 		{
-			mData.AddStates(nextL1BoxSolved);
+			int inPlaceL1 = InPlaceInLists(currentState.mL1, goalState.mL1);
+			int inPlaceL2 = InPlaceInLists(currentState.mL2, goalState.mL2);
+
+			//both lists are solved so put the robot arms in the correct spot
+			if (inPlaceL1 == goalState.mL1.size() && inPlaceL2 == goalState.mL2.size())
+			{
+				std::cout << "Here\n";
+				if (currentState.mR1.mBox != goalState.mR1.mBox)
+				{
+					std::string wantedBox = goalState.mR1.mBox;
+					if (currentState.mR2.mBox == wantedBox)
+					{
+						if (currentState.mR2.mPosition == 0)
+						{
+							if (currentState.mL1.size() > 0)
+							{
+								currentState = currentState.Stack(0);
+							}
+							else
+							{
+								currentState = currentState.PutDown(0);
+							}
+							mData.AddState(currentState);
+							currentState = currentState.Move(0, 1);
+							mData.AddState(currentState);
+							if (currentState.mL1.size() > 0)
+							{
+								currentState = currentState.Unstack(0);
+							}
+							else
+							{
+								currentState = currentState.PickUp(0);
+							}
+							mData.AddState(currentState);
+						}
+						else
+						{
+							if (currentState.mL2.size() > 0)
+							{
+								currentState = currentState.Stack(1);
+							}
+							else
+							{
+								currentState = currentState.PutDown(1);
+							}
+							mData.AddState(currentState);
+							currentState = currentState.Move(1, 0);
+							mData.AddState(currentState);
+							if (currentState.mL2.size() > 0)
+							{
+								currentState = currentState.Unstack(1);
+							}
+							else
+							{
+								currentState = currentState.PickUp(1);
+							}
+							mData.AddState(currentState);
+						}
+
+					}
+					else if (currentState.mL1.at(currentState.mL1.size() - 1) == wantedBox)
+					{
+						if (currentState.mR1.mPosition != 0)
+						{
+							currentState = currentState.Move(1, 0);
+							mData.AddState(currentState);
+						}
+						if (currentState.mL1.size() > 0)
+						{
+							currentState = currentState.Unstack(0);
+						}
+						else
+						{
+							currentState = currentState.PickUp(0);
+						}
+						mData.AddState(currentState);
+					}
+					else if (currentState.mL2.at(currentState.mL2.size() - 1) == wantedBox)
+					{
+						if (currentState.mR1.mPosition != 1)
+						{
+							currentState = currentState.Move(0, 1);
+							mData.AddState(currentState);
+						}
+						if (currentState.mL2.size() > 0)
+						{
+							currentState = currentState.Unstack(1);
+						}
+						else
+						{
+							currentState = currentState.PickUp(1);
+						}
+						mData.AddState(currentState);
+					}
+				}
+
+				if (currentState.mR2.mBox != goalState.mR2.mBox)
+				{
+					std::string wantedBox = goalState.mR2.mBox;
+					if (currentState.mR1.mBox == wantedBox)
+					{
+						if (currentState.mR1.mPosition == 0)
+						{
+							if (currentState.mL1.size() > 0)
+							{
+								currentState = currentState.Stack(0);
+							}
+							else
+							{
+								currentState = currentState.PutDown(0);
+							}
+							mData.AddState(currentState);
+							currentState = currentState.Move(0, 1);
+							mData.AddState(currentState);
+							if (currentState.mL1.size() > 0)
+							{
+								currentState = currentState.Unstack(0);
+							}
+							else
+							{
+								currentState = currentState.PickUp(0);
+							}
+							mData.AddState(currentState);
+						}
+						else
+						{
+							if (currentState.mL2.size() > 0)
+							{
+								currentState = currentState.Stack(1);
+							}
+							else
+							{
+								currentState = currentState.PutDown(1);
+							}
+							mData.AddState(currentState);
+							currentState = currentState.Move(1, 0);
+							mData.AddState(currentState);
+							if (currentState.mL2.size() > 0)
+							{
+								currentState = currentState.Unstack(1);
+							}
+							else
+							{
+								currentState = currentState.PickUp(1);
+							}
+							mData.AddState(currentState);
+						}
+
+					}
+					else if (currentState.mL1.at(currentState.mL1.size() - 1) == wantedBox)
+					{
+						if (currentState.mR2.mPosition != 0)
+						{
+							currentState = currentState.Move(1, 0);
+							mData.AddState(currentState);
+						}
+						if (currentState.mL1.size() > 0)
+						{
+							currentState = currentState.Unstack(0);
+						}
+						else
+						{
+							currentState = currentState.PickUp(0);
+						}
+						mData.AddState(currentState);
+					}
+					else if (currentState.mL2.at(currentState.mL2.size() - 1) == wantedBox)
+					{
+						if (currentState.mR2.mPosition != 1)
+						{
+							currentState = currentState.Move(0, 1);
+							mData.AddState(currentState);
+						}
+						if (currentState.mL2.size() > 0)
+						{
+							currentState = currentState.Unstack(1);
+						}
+						else
+						{
+							currentState = currentState.PickUp(1);
+						}
+						mData.AddState(currentState);
+					}
+				}
+
+				if (currentState.mR1.mPosition != goalState.mR1.mPosition)
+				{
+					currentState = currentState.Move(0, 1);
+					mData.AddState(currentState);
+				}
+				break;
+			}
+
+			//Only save the shortest moves
+			std::vector<RobotStacking::State> nextL1BoxSolved = SolveForBox(currentState, goalState, inPlaceL1, 0);
+			std::vector<RobotStacking::State> nextL2BoxSolved = SolveForBox(currentState, goalState, inPlaceL2, 1);
+			if (nextL1BoxSolved.size() > 0 && (nextL2BoxSolved.size() == 0 || nextL1BoxSolved.size() <= nextL2BoxSolved.size()))
+			{
+				mData.AddStates(nextL1BoxSolved);
+			}
+			else if (nextL2BoxSolved.size() > 0 && (nextL1BoxSolved.size() == 0 || nextL2BoxSolved.size() < nextL1BoxSolved.size()))
+			{
+				mData.AddStates(nextL2BoxSolved);
+			}
+
+			currentState = mData.GetState(mData.GetStates().size() - 1);
 		}
-		else if (nextL2BoxSolved.size() > 0 && (nextL1BoxSolved.size() == 0 || nextL2BoxSolved.size() < nextL1BoxSolved.size()))
+		auto end = std::chrono::system_clock::now();
+		std::chrono::duration<double> computationTime = end - start;
+
+		std::cout << "Computation took: " << computationTime.count() << " s\nFor: "
+			<< mData.GetStates().size()-1 << " states" << std::endl;
+
+		char seeStates = -1;
+		std::cout << "Do you want to see the states? (Y/N) ";
+		std::cin >> seeStates;
+		seeStates = std::toupper(seeStates);
+		if (seeStates == 'Y')
 		{
-			mData.AddStates(nextL2BoxSolved);
+			int stateCounter = 0;
+			for (RobotStacking::State state : mData.GetStates())
+			{
+				std::cout << "\nSTATE " << stateCounter << ": \n" << state.toString() << std::endl;
+				stateCounter++;
+				system("pause");
+			}
 		}
 
-		currentState = mData.GetState(mData.GetStates().size() - 1);
+		char again = -1;
+		std::cout << "Do you want to do it again? (Y/N) ";
+		std::cin >> again;
+		std::cin.clear();
+		std::cin.ignore(10000, '\n');
+		again = std::toupper(again);
+		goAgain = (again == 'Y') ? true : false;
 	}
-	auto end = std::chrono::system_clock::now();
-	std::chrono::duration<double> computationTime = end - start;
-
-	int stateCounter = 0;
-	for (RobotStacking::State state : mData.GetStates())
-	{
-		std::cout << "\nSTATE " << stateCounter << ": \n" << state.toString() << std::endl;
-		stateCounter++;
-		system("pause");
-	}
-	std::cout << "\nCURRENT STATE: \n" << currentState.toString() << std::endl << "Computation took: " << computationTime.count() << " s\nFor: "
-		<< mData.GetStates().size() << " states" << std::endl;
-	
-	system("pause");
 	return 0;
+}
+
+std::vector<std::string> GetLocationListFromString(std::string listString)
+{
+	std::vector<std::string> stack;
+	std::string currentBox = "";
+	for (char c : listString)
+	{
+		if (!std::isalpha(c))
+		{
+			if (!currentBox.empty())
+			{
+				stack.push_back(currentBox);
+				currentBox = "";
+			}
+		}
+		else
+		{
+			currentBox += c;
+		}
+	}
+	if (!currentBox.empty())
+	{
+		stack.push_back(currentBox);
+	}
+	return stack;
 }
 
 //Get how many places are solved in a list
